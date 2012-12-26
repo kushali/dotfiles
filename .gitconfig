@@ -1,0 +1,37 @@
+[user]
+	name = Aja Hammerly
+	email = aja@substantial.com
+[credential]
+	helper = osxkeychain
+[color]
+	ui = auto
+[alias]
+	st = status
+	co = checkout
+        m  = merge --no-ff --no-commit
+        p  = push origin HEAD
+[core]
+	excludesfile = /Users/aja/.gitignore_global
+[merge]
+  summary = false
+  tool = p4merge
+	conflictstyle = diff3
+[mergetool]
+  keepBackup = false
+  keepTemporaries = false
+	prompt = false
+[mergetool "p4merge"]
+  keepTemporaries = false
+  keepBackup = false
+[rerere]
+  enabled = true
+[push]
+  default = tracking
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
+[init]
+	templatedir = ~/.git_template
