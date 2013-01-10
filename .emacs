@@ -239,6 +239,7 @@
  '(ffap-file-finder (quote find-file-other-window))
  '(history-length 1000)
  '(indent-tabs-mode nil)
+ '(magit-default-tracking-name-function (quote magit-default-tracking-name-branch-only))
  '(ns-alternate-modifier (quote none))
  '(ns-command-modifier (quote meta))
  '(package-archives (quote (("marmalade" . "http://marmalade-repo.org/packages/") ("gnu" . "http://elpa.gnu.org/packages/"))))
@@ -292,3 +293,8 @@
     (compilation-shell-minor-mode)
     (comint-send-string buffer "guard\n")))
 
+;; Smart indent rigidly
+(add-hook 'coffee-mode-hook 'smart-indent-rigidly-mode)
+
+(require 'javascript-mode)
+(add-to-list 'auto-mode-alist '("\\.js$" . javascript-mode))
