@@ -14,7 +14,6 @@
 (global-set-key (kbd "M-s")     'fixup-whitespace)
 (global-set-key (kbd "M-C-y")   'kill-ring-search)
 (global-set-key (kbd "C-c C-d")   'delete-trailing-whitespace)
-(global-set-key (kbd "C-c g")   'magit-status)
 
 (define-key isearch-mode-map (kbd "C-o")
   (lambda ()
@@ -239,7 +238,6 @@
  '(ffap-file-finder (quote find-file-other-window))
  '(history-length 1000)
  '(indent-tabs-mode nil)
- '(magit-default-tracking-name-function (quote magit-default-tracking-name-branch-only))
  '(ns-alternate-modifier (quote none))
  '(ns-command-modifier (quote meta))
  '(package-archives (quote (("marmalade" . "http://marmalade-repo.org/packages/") ("gnu" . "http://elpa.gnu.org/packages/"))))
@@ -283,7 +281,12 @@
 ;;             (define-key haml-mode-map "\C-m" 'newline-and-indent)))
 
 ;; MAGIT
+(defun magit-tracking-name-unfucked-with (remote branch)
+  branch)
 (require 'magit)
+(global-set-key (kbd "C-c g")   'magit-status)
+ '(magit-default-tracking-name-function (quote magit-tracking-name-unfucked-with))
+
 
 (defun amh-start-guard ()
   "Fire up an instance of guard in its own buffer"
@@ -296,5 +299,13 @@
 ;; Smart indent rigidly
 (add-hook 'coffee-mode-hook 'smart-indent-rigidly-mode)
 
-(require 'javascript-mode)
-(add-to-list 'auto-mode-alist '("\\.js$" . javascript-mode))
+(add-hook 'sass-mode-hook
+          '(lambda ()
+             (progn
+               (whitespace-mode))))
+
+(add-hook 'coffee-mode-hook
+          '(lambda ()
+             (progn
+               (whitespace-mode))))
+
