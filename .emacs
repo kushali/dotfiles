@@ -164,11 +164,6 @@
 (window-number-meta-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(autoload 'js2-mode "js2" nil t)
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-(add-to-list 'auto-mode-alist '("\\.lob2$" . js2-mode))
-(add-to-list 'auto-mode-alist '("\\.lob$" . js2-mode))
-
 
 (require 'autotest)
 (put 'erase-buffer 'disabled nil)
@@ -238,6 +233,7 @@
  '(ffap-file-finder (quote find-file-other-window))
  '(history-length 1000)
  '(indent-tabs-mode nil)
+ '(magit-default-tracking-name-function (quote magit-tracking-name-unfucked-with))
  '(ns-alternate-modifier (quote none))
  '(ns-command-modifier (quote meta))
  '(package-archives (quote (("marmalade" . "http://marmalade-repo.org/packages/") ("gnu" . "http://elpa.gnu.org/packages/"))))
@@ -285,27 +281,44 @@
   branch)
 (require 'magit)
 (global-set-key (kbd "C-c g")   'magit-status)
- '(magit-default-tracking-name-function (quote magit-tracking-name-unfucked-with))
+'(magit-default-tracking-name-function (quote magit-tracking-name-unfucked-with))
 
-
-(defun amh-start-guard ()
+;;bluescape stuff
+(defun bs-start-guard ()
   "Fire up an instance of guard in its own buffer"
   (interactive)
-  (let ((buffer (shell "*guard*")))
+  (bs-um-guard)
+;;  (bs-bc-guard)
+  (bs-cs-guard))
+
+(defun bs-um-guard ()
+  (interactive)
+  (let ((buffer (shell "*guard-user-management*")))
     (set (make-local-variable 'comint-buffer-maximum-size) 5000)
     (compilation-shell-minor-mode)
-    (comint-send-string buffer "guard\n")))
+    (comint-send-string buffer "ssh vagrant\n")
+    (comint-send-string buffer "FAST=1 ./user_management_guard\n")))
 
-;; Smart indent rigidly
-(add-hook 'coffee-mode-hook 'smart-indent-rigidly-mode)
+(defun bs-cs-guard ()
+  (interactive)
+  (let ((buffer (shell "*guard-collaboration-service*")))
+    (set (make-local-variable 'comint-buffer-maximum-size) 5000)
+    (compilation-shell-minor-mode)
+    (comint-send-string buffer "ssh vagrant\n")
+    (comint-send-string buffer "./collaboration_service_guard\n")))
 
-(add-hook 'sass-mode-hook
-          '(lambda ()
-             (progn
-               (whitespace-mode))))
+(defun bs-bc-guard ()
+  (interactive)
+  (let ((buffer (shell "*guard-browser-client*")))
+    (set (make-local-variable 'comint-buffer-maximum-size) 5000)
+    (compilation-shell-minor-mode)
+    (comint-send-string buffer "ssh vagrant\n")
+    (comint-send-string buffer "./browser_client_guard\n")))
 
-(add-hook 'coffee-mode-hook
-          '(lambda ()
-             (progn
-               (whitespace-mode))))
+;; use utf-8 for everything
+(setq locale-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
 
