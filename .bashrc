@@ -1,6 +1,6 @@
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 
-PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin
+PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/usr/local/sbin
 
 if [ -f /usr/local/etc/autojump ]; then
   . /usr/local/etc/autojump
@@ -25,6 +25,9 @@ export EDITOR="emacsclient"
 
 export GUARD_NOTIFY='false'
 
-alias dbreset="rake db:drop db:create db:migrate db:seed db:test:prepare"
+export HOSTNAME='aja.local'
 
+alias dbreset="rake db:drop db:create db:migrate db:seed db:test:prepare"
+alias beg="bundle exec guard"
+alias startnginx='cd /Users/aja/thoughtstream/sites && sudo nginx -p ./ -c ./nginx.conf'
 
