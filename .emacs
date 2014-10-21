@@ -2,7 +2,12 @@
 
 (server-start)
 
+(require 'package)
+(package-initialize)
+
 (require 'whitespace)
+(require 'multiple-cursors)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Added from ryan's setup:
@@ -107,25 +112,25 @@
 (defun rwd-resize-13 (&optional nosplit)
   (interactive "P")
   (rwd-set-font-size 13)
-  (rwd-arrange-frame 163 78 nosplit)
+  (rwd-arrange-frame 163 70 nosplit)
   )
 
 (defun amh-resize-2-col (&optional nosplit)
   (interactive "P")
   (rwd-set-font-size 16)
-  (rwd-arrange-frame 163 78 nosplit)
+  (rwd-arrange-frame 163 70 nosplit)
   )
 
 (defun amh-resize-3-col (&optional nosplit)
   (interactive "P")
   (rwd-set-font-size 16)
-  (amh-screen-threeway 248 78 nosplit)
+  (amh-screen-threeway 248 70 nosplit)
   )
 
 (defun amh-resize-cinema (&optional nosplit)
   (interactive "P")
-  (rwd-set-font-size 14)
-  (amh-screen-threeway 248 78 nosplit)
+  (rwd-set-font-size 16)
+  (amh-screen-threeway 248 70 nosplit)
   )
 
 (defun rwd-resize-presentation ()
@@ -150,9 +155,8 @@
 
 (if window-system
     (add-hook 'after-init-hook
-              (lambda () (run-with-idle-timer 0.25 nil #'amh-resize-3-col)
-                         (server-start)) t))
-
+              (lambda () (run-with-idle-timer 0.25 nil #'rwd-resize-13)
+                (server-start)) t))
 (require 'uniquify)
 (setq
  uniquify-strip-common-suffix t
@@ -168,16 +172,16 @@
 (require 'autotest)
 (put 'erase-buffer 'disabled nil)
 (autoload 'ruby-mode "ruby-mode"
-    "Mode for editing ruby source files")
+  "Mode for editing ruby source files")
 (add-to-list 'auto-mode-alist '("\\.rb$" . ruby-mode))
 (add-to-list 'auto-mode-alist '("\\.rake$" . ruby-mode))
 (add-to-list 'auto-mode-alist '("\\Rakefile$" . ruby-mode))
 (add-to-list 'interpreter-mode-alist '("ruby" . ruby-mode))
 
 (autoload 'run-ruby "inf-ruby"
-    "Run an inferior Ruby process")
+  "Run an inferior Ruby process")
 (autoload 'inf-ruby-keys "inf-ruby"
-    "Set local key defs for inf-ruby in ruby-mode")
+  "Set local key defs for inf-ruby in ruby-mode")
 
 (add-hook 'ruby-mode-hook
           '(lambda ()
@@ -209,6 +213,7 @@
            "/bin/bash -lc 'echo -n $CDPATH'")))
 
 (let ((extra-path-dirs '("/opt/local/bin"
+                         "/usr/local/bin"
                          "/MyApplications/dev/lisp/PLTScheme/bin"
                          "/opt/local/lib/postgresql82/bin"))
       (path (split-string (getenv "PATH") ":" t)))
@@ -236,8 +241,10 @@
  '(magit-default-tracking-name-function (quote magit-tracking-name-unfucked-with))
  '(ns-alternate-modifier (quote none))
  '(ns-command-modifier (quote meta))
- '(package-archives (quote (("marmalade" . "http://marmalade-repo.org/packages/") ("gnu" . "http://elpa.gnu.org/packages/"))))
+ '(org-journal-dir "~/reference/journal/")
+ '(package-archives (quote (("marmalade" . "http://marmalade-repo.org/packages/") ("gnu" . "http://elpa.gnu.org/packages/") ("melpa" . "http://melpa.milkbox.net/packages/"))))
  '(prolog-program-name "/usr/local/bin/gprolog")
+ '(require-final-newline t)
  '(save-place t nil (saveplace))
  '(save-place-limit 250)
  '(save-place-save-skipped nil)
@@ -258,23 +265,7 @@
  '(font-lock-comment-face ((((class color) (min-colors 88) (background light)) (:foreground "Dark Blue"))))
  '(font-lock-string-face ((((class color) (min-colors 88) (background light)) (:foreground "ForestGreen")))))
 
-(add-to-list 'auto-mode-alist '("\\.pl$" . prolog-mode))
-
-;; TRYING PROLOG MODE
-(autoload 'run-prolog "prolog" "Start a Prolog sub-process." t)
-(autoload 'prolog-mode "prolog" "Major mode for editing Prolog programs." t)
-(autoload 'mercury-mode "prolog" "Major mode for editing Mercury programs." t)
-(setq prolog-system 'gnu)
-(setq auto-mode-alist (append '(("\\.pl$" . prolog-mode)
-                                ("\\.m$" . mercury-mode))
-                              auto-mode-alist))
-
-;; TRYING HAML MODE
 (require 'haml-mode)
-;; (add-hook 'haml-mode-hook
-;;           (lambda ()
-;;             (setq indent-tabs-mode nil)
-;;             (define-key haml-mode-map "\C-m" 'newline-and-indent)))
 
 ;; MAGIT
 (defun magit-tracking-name-unfucked-with (remote branch)
@@ -283,37 +274,76 @@
 (global-set-key (kbd "C-c g")   'magit-status)
 '(magit-default-tracking-name-function (quote magit-tracking-name-unfucked-with))
 
-;;bluescape stuff
-(defun bs-start-guard ()
-  "Fire up an instance of guard in its own buffer"
-  (interactive)
-  (bs-um-guard)
-;;  (bs-bc-guard)
-  (bs-cs-guard))
+(add-hook 'yaml-mode-hook
+          '(lambda ()
+             (progn
+               (whitespace-mode))))
 
-(defun bs-um-guard ()
+(defun mg-tests ()
+  "Fire up the tests for the mansion project"
   (interactive)
-  (let ((buffer (shell "*guard-user-management*")))
+  (let ((buffer (shell "*guard-mansion*")))
     (set (make-local-variable 'comint-buffer-maximum-size) 5000)
     (compilation-shell-minor-mode)
-    (comint-send-string buffer "ssh vagrant\n")
-    (comint-send-string buffer "FAST=1 ./user_management_guard\n")))
+    (comint-send-string buffer "bundle exec guard")))
 
-(defun bs-cs-guard ()
+(defun mg-foreman ()
+  "Start up foreman for the mansion project"
   (interactive)
-  (let ((buffer (shell "*guard-collaboration-service*")))
+  (let ((buffer (shell "*foreman-mansion*")))
     (set (make-local-variable 'comint-buffer-maximum-size) 5000)
     (compilation-shell-minor-mode)
-    (comint-send-string buffer "ssh vagrant\n")
-    (comint-send-string buffer "./collaboration_service_guard\n")))
+    (comint-send-string buffer "bundle exec foreman")))
 
-(defun bs-bc-guard ()
-  (interactive)
-  (let ((buffer (shell "*guard-browser-client*")))
-    (set (make-local-variable 'comint-buffer-maximum-size) 5000)
-    (compilation-shell-minor-mode)
-    (comint-send-string buffer "ssh vagrant\n")
-    (comint-send-string buffer "./browser_client_guard\n")))
+;; bluescape stuff
+;; (defun bs-start-tests ()
+;;   "Fire up the tests for the bluescape project"
+;;   (interactive)
+;;   (bs-um-guard)
+;;   (bs-bc-guard)
+;;   (bs-cs-grunt)
+;;   (bs-sb-grunt)
+;;   (bs-health-grunt))
+
+;; (defun bs-um-guard ()
+;;   (interactive)
+;;   (let ((buffer (shell "*guard-user-management*")))
+;;     (set (make-local-variable 'comint-buffer-maximum-size) 5000)
+;;     (compilation-shell-minor-mode)
+;;     (comint-send-string buffer "ssh vagrant\n")
+;;     (comint-send-string buffer "FAST=1 ./dev_user_management\n")))
+
+;; (defun bs-cs-grunt ()
+;;   (interactive)
+;;   (let ((buffer (shell "*grunt-collaboration-service*")))
+;;     (set (make-local-variable 'comint-buffer-maximum-size) 5000)
+;;     (compilation-shell-minor-mode)
+;;     (comint-send-string buffer "ssh vagrant\n")
+;;     (comint-send-string buffer "./dev_collaboration_service\n")))
+
+;; (defun bs-health-grunt ()
+;;   (interactive)
+;;   (let ((buffer (shell "*grunt-health*")))
+;;     (set (make-local-variable 'comint-buffer-maximum-size) 5000)
+;;     (compilation-shell-minor-mode)
+;;     (comint-send-string buffer "ssh vagrant\n")
+;;     (comint-send-string buffer "./dev_health\n")))
+
+;; (defun bs-sb-grunt ()
+;;   (interactive)
+;;   (let ((buffer (shell "*grunt-socket-bridge*")))
+;;     (set (make-local-variable 'comint-buffer-maximum-size) 5000)
+;;     (compilation-shell-minor-mode)
+;;     (comint-send-string buffer "ssh vagrant\n")
+;;     (comint-send-string buffer "./dev_socket_bridge\n")))
+
+;; (defun bs-bc-guard ()
+;;   (interactive)
+;;    (let ((buffer (shell "*guard-browser-client*")))
+;;     (set (make-local-variable 'comint-buffer-maximum-size) 5000)
+;;     (compilation-shell-minor-mode)
+;;     (comint-send-string buffer "ssh vagrant\n")
+;;     (comint-send-string buffer "./dev_browser_client\n")))
 
 ;; use utf-8 for everything
 (setq locale-coding-system 'utf-8)
@@ -322,3 +352,18 @@
 (set-selection-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
 
+(defun force-save ()
+ (interactive)
+ (not-modified 1)
+ (save-buffer))
+
+(global-set-key (kbd "C-x C-s") 'force-save)
+
+(require 'tramp)
+
+(add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
+
+
+;; UNDER CONSIDERATION
+
+(set-default 'tramp-default-proxies-alist (quote ((".*" "\\`root\\'" "/ssh:%h:"))))
