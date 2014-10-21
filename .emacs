@@ -295,56 +295,6 @@
     (compilation-shell-minor-mode)
     (comint-send-string buffer "bundle exec foreman")))
 
-;; bluescape stuff
-;; (defun bs-start-tests ()
-;;   "Fire up the tests for the bluescape project"
-;;   (interactive)
-;;   (bs-um-guard)
-;;   (bs-bc-guard)
-;;   (bs-cs-grunt)
-;;   (bs-sb-grunt)
-;;   (bs-health-grunt))
-
-;; (defun bs-um-guard ()
-;;   (interactive)
-;;   (let ((buffer (shell "*guard-user-management*")))
-;;     (set (make-local-variable 'comint-buffer-maximum-size) 5000)
-;;     (compilation-shell-minor-mode)
-;;     (comint-send-string buffer "ssh vagrant\n")
-;;     (comint-send-string buffer "FAST=1 ./dev_user_management\n")))
-
-;; (defun bs-cs-grunt ()
-;;   (interactive)
-;;   (let ((buffer (shell "*grunt-collaboration-service*")))
-;;     (set (make-local-variable 'comint-buffer-maximum-size) 5000)
-;;     (compilation-shell-minor-mode)
-;;     (comint-send-string buffer "ssh vagrant\n")
-;;     (comint-send-string buffer "./dev_collaboration_service\n")))
-
-;; (defun bs-health-grunt ()
-;;   (interactive)
-;;   (let ((buffer (shell "*grunt-health*")))
-;;     (set (make-local-variable 'comint-buffer-maximum-size) 5000)
-;;     (compilation-shell-minor-mode)
-;;     (comint-send-string buffer "ssh vagrant\n")
-;;     (comint-send-string buffer "./dev_health\n")))
-
-;; (defun bs-sb-grunt ()
-;;   (interactive)
-;;   (let ((buffer (shell "*grunt-socket-bridge*")))
-;;     (set (make-local-variable 'comint-buffer-maximum-size) 5000)
-;;     (compilation-shell-minor-mode)
-;;     (comint-send-string buffer "ssh vagrant\n")
-;;     (comint-send-string buffer "./dev_socket_bridge\n")))
-
-;; (defun bs-bc-guard ()
-;;   (interactive)
-;;    (let ((buffer (shell "*guard-browser-client*")))
-;;     (set (make-local-variable 'comint-buffer-maximum-size) 5000)
-;;     (compilation-shell-minor-mode)
-;;     (comint-send-string buffer "ssh vagrant\n")
-;;     (comint-send-string buffer "./dev_browser_client\n")))
-
 ;; use utf-8 for everything
 (setq locale-coding-system 'utf-8)
 (set-terminal-coding-system 'utf-8)
